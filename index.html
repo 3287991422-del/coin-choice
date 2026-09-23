@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>命运六边形硬币</title>
+<title>抉择硬币</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; }
@@ -65,11 +65,11 @@
 
   .stage { position: relative; width: 260px; height: 240px; display: flex; justify-content: center; }
   #hand {
-    position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-    font-size: 64px; z-index: 1;
+    position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
+    width: 180px; z-index: 1; filter: drop-shadow(0 6px 8px rgba(90,50,10,.25));
   }
   #hand.flick { animation: flick .35s ease; }
-  @keyframes flick { 0%{transform:translateX(-50%) translateY(0);} 45%{transform:translateX(-50%) translateY(-34px);} 100%{transform:translateX(-50%) translateY(0);} }
+  @keyframes flick { 0%{transform:translateX(-50%) translateY(0);} 45%{transform:translateX(-50%) translateY(-40px);} 100%{transform:translateX(-50%) translateY(0);} }
   #coinWrap {
     position: absolute; top: 6px; left: 50%; margin-left: -70px;
     width: 140px; height: 140px; z-index: 2;
@@ -88,7 +88,7 @@
   @keyframes spinFast { from { transform: rotateX(0deg);} to { transform: rotateX(360deg);} }
 
   #result {
-    margin-top: 4px; font-size: 42px; font-weight: 800; letter-spacing: 3px;
+    margin-top: 4px; font-size: clamp(26px, 8vw, 42px); font-weight: 800; letter-spacing: 3px;
     opacity: 0; transform: scale(.6); transition: all .35s cubic-bezier(.2,1.6,.4,1);
     min-height: 56px; text-align: center;
   }
@@ -133,11 +133,50 @@
   .rec-time { font-size: 10px; color: #b8a488; margin-top: 4px; }
   .empty-tip { font-size: 12px; color: #b8a488; text-align: center; padding: 10px 0; }
 
+  /* ---------- 天空层（抛硬币时浮现） ---------- */
+  #sky {
+    position: fixed; inset: 0; z-index: 0; opacity: 0;
+    transition: opacity .5s ease; pointer-events: none; overflow: hidden;
+    background: linear-gradient(180deg, #6fbcf5 0%, #a9d9fa 55%, #e6f4ff 100%);
+  }
+  body.flying #sky { opacity: 1; }
+  .screen { z-index: 1; }
+  #sky .sun, #sky .moon { position: absolute; top: 7%; right: 10%; width: 72px; height: 72px; border-radius: 50%; }
+  #sky .sun { background: radial-gradient(circle, #fff6c4 18%, #ffd54a 55%, rgba(255,213,74,0) 78%); box-shadow: 0 0 70px 24px rgba(255,220,100,.5); }
+  #sky .moon { background: radial-gradient(circle at 35% 35%, #fdfbf3 55%, #d9d4c4 100%); box-shadow: 0 0 50px 14px rgba(255,255,240,.35); }
+  #sky .cloud { position: absolute; background: rgba(255,255,255,.92); border-radius: 999px; filter: blur(1px); }
+  #sky .cloud::before, #sky .cloud::after { content: ""; position: absolute; background: inherit; border-radius: 50%; }
+  #sky .cloud::before { width: 58%; height: 165%; left: 13%; top: -75%; }
+  #sky .cloud::after { width: 44%; height: 130%; right: 15%; top: -52%; }
+  #sky .star { position: absolute; width: 3px; height: 3px; background: #fff; border-radius: 50%; opacity: .9; }
+  #sky .rain { position: absolute; inset: 0; background: repeating-linear-gradient(105deg, rgba(255,255,255,.30) 0 1px, transparent 1px 16px); animation: rainfall .45s linear infinite; }
+  @keyframes rainfall { from { background-position: 0 0; } to { background-position: -30px 80px; } }
+  #sky .snowdot { position: absolute; background: #fff; border-radius: 50%; opacity: .9; animation: snowfall linear infinite; }
+  @keyframes snowfall { from { transform: translateY(-8vh); } to { transform: translateY(112vh); } }
+  #sky.theme-night  { background: linear-gradient(180deg, #0e1a3a 0%, #1e2f5e 55%, #3a4f86 100%); }
+  #sky.theme-cloudy { background: linear-gradient(180deg, #9fb4c7 0%, #c7d5e0 60%, #eef2f6 100%); }
+  #sky.theme-rain   { background: linear-gradient(180deg, #46566a 0%, #6b7c8f 60%, #97a6b4 100%); }
+  #sky.theme-snow   { background: linear-gradient(180deg, #a7b6c7 0%, #d8e2ec 60%, #f4f8fb 100%); }
+  #sky.theme-fog    { background: linear-gradient(180deg, #b7c2c9 0%, #d5dde2 60%, #eef1f3 100%); }
+
+  /* ---------- 自定义两个选项 ---------- */
+  #customToggle { margin-top: 10px; font-size: 12px; color: #c07b1e; cursor: pointer; text-decoration: underline dotted; user-select: none; }
+  #customBox { display: none; gap: 8px; margin-top: 8px; width: min(78vw, 360px); }
+  #customBox.open { display: flex; }
+  #customBox input {
+    flex: 1; min-width: 0; padding: 10px 12px; border: 2px solid #eccfa3; border-radius: 12px;
+    background: #fffdf8; font-size: 13px; color: #4a3728; outline: none;
+  }
+  #customBox input:focus { border-color: #f0a832; }
+
   /* 六边形硬币 SVG 内部 */
   .face { pointer-events: none; }
 </style>
 </head>
 <body>
+
+<!-- 抛硬币时浮现的真实天空层（按当地实时天气变化） -->
+<div id="sky"></div>
 
 <!-- ============ 第一页：简介 ============ -->
 <div id="screen1" class="screen active">
@@ -159,38 +198,100 @@
     <div id="coinWrap">
       <svg id="coinSvg" viewBox="0 0 120 120">
         <defs>
-          <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#ffe9a8"/>
-            <stop offset="50%" stop-color="#f5b942"/>
-            <stop offset="100%" stop-color="#d98e1f"/>
+          <radialGradient id="goldFace" cx="35%" cy="28%" r="85%">
+            <stop offset="0%" stop-color="#fff9e0"/>
+            <stop offset="42%" stop-color="#ffdd80"/>
+            <stop offset="78%" stop-color="#eeb03a"/>
+            <stop offset="100%" stop-color="#cf8318"/>
+          </radialGradient>
+          <linearGradient id="goldRim" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#fbe7ac"/>
+            <stop offset="50%" stop-color="#e8a92e"/>
+            <stop offset="100%" stop-color="#9c6410"/>
           </linearGradient>
+          <filter id="coinGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#a8641a" flood-opacity="0.45"/>
+          </filter>
         </defs>
-        <polygon points="60,5 107,32.5 107,87.5 60,115 13,87.5 13,32.5"
-                 fill="url(#gold)" stroke="#b57a12" stroke-width="4" stroke-linejoin="round"/>
-        <polygon points="60,15 98,37 98,83 60,105 22,83 22,37"
-                 fill="none" stroke="#fff3cf" stroke-width="2.5" stroke-linejoin="round" opacity=".8"/>
-        <g class="face">
-          <ellipse cx="45" cy="52" rx="4.5" ry="6" fill="#5b3d10"/>
-          <ellipse cx="75" cy="52" rx="4.5" ry="6" fill="#5b3d10"/>
-          <circle cx="46.5" cy="50" r="1.6" fill="#fff"/>
-          <circle cx="76.5" cy="50" r="1.6" fill="#fff"/>
-          <circle cx="36" cy="64" r="5" fill="#ff9d6b" opacity=".55"/>
-          <circle cx="84" cy="64" r="5" fill="#ff9d6b" opacity=".55"/>
-          <path d="M48 70 Q60 80 72 70" stroke="#5b3d10" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <g filter="url(#coinGlow)">
+          <!-- 外圈：立体包边 -->
+          <polygon points="60,3 109,31.5 109,88.5 60,117 11,88.5 11,31.5"
+                   fill="url(#goldRim)" stroke="#8a5a0c" stroke-width="2" stroke-linejoin="round"/>
+          <!-- 面板：高级渐变面 -->
+          <polygon points="60,10 103,35 103,85 60,110 17,85 17,35"
+                   fill="url(#goldFace)" stroke="#c98a1d" stroke-width="1.2" stroke-linejoin="round"/>
+          <!-- 内圈细纹 -->
+          <polygon points="60,16 98,38 98,82 60,104 22,82 22,38"
+                   fill="none" stroke="#fff4cd" stroke-width="1.6" stroke-linejoin="round"
+                   stroke-dasharray="4 3" opacity=".85"/>
+          <!-- 高光 -->
+          <path d="M28 32 Q40 18 58 15" stroke="#fffdf2" stroke-width="4.5" fill="none"
+                stroke-linecap="round" opacity=".85"/>
+          <path d="M92 88 Q84 97 70 102" stroke="#8a5a0c" stroke-width="2.5" fill="none"
+                stroke-linecap="round" opacity=".25"/>
+          <!-- 闪星星 -->
+          <path d="M88 30 l1.6 4 4 1.6 -4 1.6 -1.6 4 -1.6 -4 -4 -1.6 4 -1.6 z" fill="#fffbe8" opacity=".95"/>
+          <path d="M26 74 l1.1 2.8 2.8 1.1 -2.8 1.1 -1.1 2.8 -1.1 -2.8 -2.8 -1.1 2.8 -1.1 z" fill="#fffbe8" opacity=".8"/>
+          <!-- 可爱脸 -->
+          <g class="face">
+            <ellipse cx="45" cy="51" rx="5.2" ry="6.6" fill="#4a2f0a"/>
+            <ellipse cx="75" cy="51" rx="5.2" ry="6.6" fill="#4a2f0a"/>
+            <circle cx="46.8" cy="48.6" r="2.1" fill="#fff"/>
+            <circle cx="76.8" cy="48.6" r="2.1" fill="#fff"/>
+            <circle cx="43.6" cy="53.6" r="1" fill="#fff" opacity=".8"/>
+            <circle cx="73.6" cy="53.6" r="1" fill="#fff" opacity=".8"/>
+            <path d="M40 44 q5 -3 9 -1" stroke="#4a2f0a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            <path d="M70 43 q4 -2 9 1" stroke="#4a2f0a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            <circle cx="35" cy="63" r="5.5" fill="#ff9d6b" opacity=".5"/>
+            <circle cx="85" cy="63" r="5.5" fill="#ff9d6b" opacity=".5"/>
+            <path d="M53 68 q2.5 3 5 0 q2.5 3 5 0" stroke="#4a2f0a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+          </g>
         </g>
-        <path d="M30 30 Q42 18 58 16" stroke="#fffbe8" stroke-width="4" fill="none" stroke-linecap="round" opacity=".7"/>
       </svg>
     </div>
-    <div id="hand">🤚</div>
+    <div id="hand">
+      <svg viewBox="0 0 200 150">
+        <defs>
+          <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ffdcb8"/>
+            <stop offset="100%" stop-color="#f0b083"/>
+          </linearGradient>
+        </defs>
+        <!-- 手掌 -->
+        <path d="M55 78 Q50 58 62 50 L138 50 Q152 56 148 78 L142 108 Q120 128 96 126 Q68 122 60 104 Z"
+              fill="url(#skin)" stroke="#d68f5c" stroke-width="2.5" stroke-linejoin="round"/>
+        <!-- 四根手指 -->
+        <rect x="62"  y="18" width="18" height="46" rx="9"  fill="url(#skin)" stroke="#d68f5c" stroke-width="2.5"/>
+        <rect x="84"  y="10" width="19" height="54" rx="9.5" fill="url(#skin)" stroke="#d68f5c" stroke-width="2.5"/>
+        <rect x="107" y="12" width="19" height="52" rx="9.5" fill="url(#skin)" stroke="#d68f5c" stroke-width="2.5"/>
+        <rect x="130" y="22" width="17" height="42" rx="8.5" fill="url(#skin)" stroke="#d68f5c" stroke-width="2.5"/>
+        <!-- 拇指 -->
+        <path d="M148 92 Q168 84 170 70 Q171 60 162 60 Q154 61 148 72 Z"
+              fill="url(#skin)" stroke="#d68f5c" stroke-width="2.5" stroke-linejoin="round"/>
+        <!-- 掌纹与细节 -->
+        <path d="M84 92 Q100 100 120 92" stroke="#e2a273" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M88 104 Q102 110 116 104" stroke="#e2a273" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".7"/>
+        <ellipse cx="72" cy="24" rx="4" ry="6" fill="#ffe9cf"/>
+        <ellipse cx="94" cy="16" rx="4" ry="6" fill="#ffe9cf"/>
+        <ellipse cx="117" cy="18" rx="4" ry="6" fill="#ffe9cf"/>
+        <ellipse cx="139" cy="28" rx="3.5" ry="5" fill="#ffe9cf"/>
+      </svg>
+    </div>
   </div>
 
   <div id="result"></div>
   <div id="resultTip"></div>
 
-  <input id="questionInput" type="text" maxlength="50" placeholder="在这里写下你的问题…" autocomplete="off">
+  <input id="questionInput" type="text" maxlength="50" placeholder="写下你的纠结，硬币给你个参考意见～" autocomplete="off">
   <button id="startBtn" onclick="startToss()">开始</button>
 
-  <div class="privacy-note">🔒 问题和记录只保存在你自己的设备上，别人看不到</div>
+  <div id="customToggle" onclick="toggleCustom()">⚙️ 我有两个自己的选项（可选）</div>
+  <div id="customBox">
+    <input id="optA" type="text" maxlength="12" placeholder="选项 A，比如：去" autocomplete="off">
+    <input id="optB" type="text" maxlength="12" placeholder="选项 B，比如：不去" autocomplete="off">
+  </div>
+
+  <div class="privacy-note">🔒 记录只存在你自己的设备上 · 🌍 定位仅用于查询天气，不会保存</div>
 
   <div id="historyPanel">
     <h3>📜 我的抉择记录 <button id="clearBtn" onclick="clearRecords()">清空</button></h3>
@@ -203,6 +304,7 @@
 function goNext() {
   document.getElementById('screen1').classList.remove('active');
   document.getElementById('screen2').classList.add('active');
+  initSky();
   renderHistory();
 }
 
@@ -268,11 +370,11 @@ const KEY = 'hexcoin_records_v1';
 function loadRecords() { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { return []; } }
 function saveRecords(rs) { localStorage.setItem(KEY, JSON.stringify(rs)); }
 
-function appendToss(qText, result) {
+function appendToss(qText, result, label) {
   const rs = loadRecords();
   let rec = rs.find(r => r.q === qText);
   if (!rec) { rec = { q: qText, tosses: [], time: Date.now() }; rs.unshift(rec); }
-  rec.tosses.push({ r: result, t: Date.now() });
+  rec.tosses.push({ r: result, label: label || '', t: Date.now() });
   saveRecords(rs);
   return rec;
 }
@@ -292,7 +394,7 @@ function renderHistory() {
     <div class="rec-card">
       <div class="rec-q">❓ ${escapeHtml(rec.q)}</div>
       <div class="rec-tosses">
-        ${rec.tosses.map((t, i) => `<span class="chip ${t.r}">第${i + 1}次 · ${t.r.toUpperCase()}</span>`).join('')}
+        ${rec.tosses.map((t, i) => `<span class="chip ${t.r}">第${i + 1}次 · ${escapeHtml(t.label || t.r.toUpperCase())}</span>`).join('')}
       </div>
       <div class="rec-time">共 ${rec.tosses.length} 次抛掷 · 最近 ${fmtTime(rec.tosses[rec.tosses.length - 1].t)}</div>
     </div>`).join('');
@@ -319,11 +421,92 @@ const wittyStart = [
   '加油啊硬币，全靠你了！',
 ];
 const dizzyMsg = '不要再抛啦，我要摇晕啦，就选择它吧！🤪';
-const resultTipMap = {
-  yes: '命运点头：勇敢去做的你，会有好结果的 ✨',
-  no:  '命运摇头：放下它，前方有更好的在等你 🍃',
-  or:  '命运摊手：or —— 全都要，或者都不要 😏',
+
+/* 结果提示语（支持自定义选项文字） */
+const tipFns = {
+  yes: L => `命运点头：选「${L.yes}」不会有错 ✨`,
+  no:  L => `命运摇头：放下「${L.no}」，前方有更好的在等你 🍃`,
+  or:  L => `命运摊手：都要，或者都不要——这个参考意见够大胆吧 😏`,
 };
+
+/* 自定义两个选项 */
+function toggleCustom() {
+  document.getElementById('customBox').classList.toggle('open');
+}
+function getLabels() {
+  const a = document.getElementById('optA').value.trim();
+  const b = document.getElementById('optB').value.trim();
+  return (a && b) ? { yes: a, no: b, or: '都要/都不要' } : { yes: 'YES', no: 'NO', or: 'OR' };
+}
+
+/* ================= 真实天空：定位 → Open-Meteo 免费天气 → 换肤 ================= */
+const skyEl = document.getElementById('sky');
+let weatherName = '好天气 🌤️';
+
+function themeFor(code, isDay) {
+  if (code <= 1) return isDay ? 'clear-day' : 'night';
+  if (code <= 3) return 'cloudy';
+  if (code >= 45 && code <= 48) return 'fog';
+  if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82) || code >= 95) return 'rain';
+  if ((code >= 71 && code <= 77) || code === 85 || code === 86) return 'snow';
+  return isDay ? 'clear-day' : 'night';
+}
+function decorate(theme) {
+  skyEl.innerHTML = '';
+  const mk = (cls, style) => {
+    const d = document.createElement('div');
+    d.className = cls;
+    Object.assign(d.style, style);
+    skyEl.appendChild(d);
+    return d;
+  };
+  if (theme === 'clear-day') {
+    mk('sun', {});
+    mk('cloud', { width: '160px', height: '44px', top: '18%', left: '12%' });
+    mk('cloud', { width: '110px', height: '34px', top: '32%', right: '18%' });
+  } else if (theme === 'night') {
+    mk('moon', {});
+    for (let i = 0; i < 16; i++) {
+      mk('star', { top: Math.random() * 55 + '%', left: Math.random() * 95 + '%',
+                   transform: `scale(${0.6 + Math.random()})` });
+    }
+  } else if (theme === 'cloudy' || theme === 'rain' || theme === 'snow') {
+    mk('cloud', { width: '190px', height: '52px', top: '12%', left: '10%' });
+    mk('cloud', { width: '140px', height: '40px', top: '26%', right: '14%' });
+    mk('cloud', { width: '100px', height: '30px', top: '40%', left: '45%', opacity: .7 });
+    if (theme === 'rain') mk('rain', {});
+    if (theme === 'snow') {
+      for (let i = 0; i < 18; i++) {
+        const s = 3 + Math.random() * 5;
+        mk('snowdot', { width: s + 'px', height: s + 'px', left: Math.random() * 98 + '%',
+                        top: '-5vh', animationDuration: 5 + Math.random() * 6 + 's',
+                        animationDelay: -Math.random() * 8 + 's' });
+      }
+    }
+  }
+  /* fog / default：留白即可 */
+}
+function applySky(theme, name) {
+  skyEl.className = theme === 'night' ? 'theme-night' : 'theme-' + theme;
+  decorate(theme);
+  weatherName = name;
+}
+function initSky() {
+  const fallback = () => applySky('clear-day', '好天气 🌤️');
+  if (!navigator.geolocation) { fallback(); return; }
+  navigator.geolocation.getCurrentPosition(pos => {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&current=weather_code,is_day`;
+    fetch(url).then(r => r.json()).then(d => {
+      const code = d.current.weather_code, isDay = d.current.is_day === 1;
+      const theme = themeFor(code, isDay);
+      const names = {
+        'clear-day': '晴朗天空 ☀️', 'night': '静谧夜空 🌙', 'cloudy': '多云天空 ☁️',
+        'fog': '薄雾弥漫 🌫️', 'rain': '落雨天空 🌧️', 'snow': '飘雪天空 ❄️',
+      };
+      applySky(theme, names[theme] || '此刻的天空');
+    }).catch(fallback);
+  }, fallback, { timeout: 6000 });
+}
 
 /* ================= 抛掷主流程 ================= */
 const coinWrap = document.getElementById('coinWrap');
@@ -335,11 +518,13 @@ const input = document.getElementById('questionInput');
 let tossing = false;
 
 function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
-function setHand(emoji) { hand.textContent = emoji; }
 
 async function startToss() {
   const qText = input.value.trim();
-  if (!qText) { bubble('先写下你想问的事吧 ✍️'); input.focus(); return; }
+  if (!qText) { bubble('先写下你的纠结吧 ✍️'); input.focus(); return; }
+  const a = document.getElementById('optA').value.trim();
+  const b = document.getElementById('optB').value.trim();
+  if ((a && !b) || (!a && b)) { bubble('两个选项要么都填，要么都不填哦 🙃'); return; }
   if (tossing) return;
   tossing = true; startBtn.disabled = true;
   ensureAudio();
@@ -348,8 +533,9 @@ async function startToss() {
   bubble(wittyStart[Math.floor(Math.random() * wittyStart.length)]);
   await wait(900);
 
-  // 抛出
-  setHand('🫱');
+  // 抛出：天空浮现，手把硬币送上天
+  document.body.classList.add('flying');
+  bubble(`${weatherName}，正适合做决定 ✨`);
   hand.classList.add('flick');
   whoosh(true);
   coinWrap.classList.add('tossing');
@@ -368,20 +554,21 @@ async function startToss() {
   coinWrap.classList.remove('tossing');
   coinWrap.classList.remove('spinning');
   hand.classList.remove('flick');
-  setHand('🤚');
   thud();
+  setTimeout(() => document.body.classList.remove('flying'), 700);
 
   const rs = loadRecords();
   const prev = rs.find(r => r.q === qText);
   const result = rollResult(prev ? prev.tosses : []);
-  const rec = appendToss(qText, result);
+  const labels = getLabels();
+  const rec = appendToss(qText, result, labels[result]);
 
   // 结果展示
   const colors = { yes: '#1d9d4c', no: '#d64545', or: '#8a3ec9' };
-  resultEl.textContent = result.toUpperCase();
+  resultEl.textContent = labels[result];
   resultEl.style.color = colors[result];
   resultEl.classList.add('show');
-  tipEl.textContent = resultTipMap[result];
+  tipEl.textContent = tipFns[result](labels);
 
   // 连续3次相同 → 硬币抗议
   const t = rec.tosses;
