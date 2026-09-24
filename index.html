@@ -600,34 +600,65 @@ function thud() {
 }
 
 /* ================= 昼夜环境音（白天鸟鸣+微风 / 夜晚虫鸣+夜风） ================= */
-let ambTimer = null, windSrc = null, windGain = null;
+let ambTimer = null, windSrc = null, windGain = null, droneNodes = null;
 function startAmbience() {
   if (!soundOn) return;
   if (!ensureAudio()) return;
   if (ambTimer) return;
-  // 持续的底噪风声（很轻）
+  const night = document.body.classList.contains('night');
+  const overcast = document.body.classList.contains('overcast');
+  // 持续底噪：夜里极轻，阴天风声更明显
   windSrc = ac.createBufferSource(); windSrc.buffer = _noise; windSrc.loop = true;
-  const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 240;
+  const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = night ? 160 : 240;
   windGain = ac.createGain();
-  windGain.gain.value = document.body.classList.contains('night') ? 0.008 : 0.016;
+  windGain.gain.value = night ? 0.005 : (overcast ? 0.028 : 0.014);
   windSrc.connect(f); f.connect(windGain); windGain.connect(ac.destination);
   windSrc.start();
-  // 周期性点缀：白天鸟叫，夜晚虫鸣
+  if (night) startDrone();
   scheduleAmb();
   ambTimer = setInterval(scheduleAmb, 3000);
 }
 function stopAmbience() {
   if (ambTimer) { clearInterval(ambTimer); ambTimer = null; }
   if (windSrc) { try { windSrc.stop(); } catch (e) {} windSrc = null; windGain = null; }
+  stopDrone();
 }
 function scheduleAmb() {
   if (!soundOn || !ac || ac.state !== 'running') return;
-  if (document.body.classList.contains('night')) {
-    cricket();
-    if (Math.random() < 0.22) owlHoot();
+  const body = document.body.classList;
+  if (body.contains('night')) {
+    // 外太空：低鸣常驻，偶发掠过的呼啸与星星微响，没有鸟虫
+    if (Math.random() < 0.35) spaceWhoosh();
+    if (Math.random() < 0.25) starPing();
+  } else if (body.contains('overcast')) {
+    // 阴天：只有风声阵阵，没有鸟虫
+    if (Math.random() < 0.7) windGust();
+  } else if (body.contains('cloudy')) {
+    // 多云：偶尔鸟叫 + 阵风
+    if (Math.random() < 0.35) birdChirp();
+    if (Math.random() < 0.3) windGust();
   } else {
-    if (Math.random() < 0.75) birdChirp();
+    // 晴天：海浪为主（更响）+ 偶尔鸟叫
+    if (Math.random() < 0.85) waveSwell();
+    if (Math.random() < 0.4) birdChirp();
   }
+}
+/* 太空低鸣：两只略微失谐的低频正弦波缓慢起伏 */
+function startDrone() {
+  const g = ac.createGain(); g.gain.value = 0.016;
+  const o1 = ac.createOscillator(); o1.type = 'sine'; o1.frequency.value = 52 + Math.random() * 8;
+  const o2 = ac.createOscillator(); o2.type = 'sine'; o2.frequency.value = 52.7 + Math.random() * 8;
+  const lfo = ac.createOscillator(); lfo.frequency.value = 0.07 + Math.random() * 0.05;
+  const lg = ac.createGain(); lg.gain.value = 0.008;
+  lfo.connect(lg); lg.connect(g.gain);
+  o1.connect(g); o2.connect(g); g.connect(ac.destination);
+  o1.start(); o2.start(); lfo.start();
+  droneNodes = { o1, o2, lfo, g };
+}
+function stopDrone() {
+  if (!droneNodes) return;
+  try { droneNodes.o1.stop(); droneNodes.o2.stop(); droneNodes.lfo.stop(); } catch (e) {}
+  droneNodes = null;
 }
 function birdChirp() {
   const t0 = ac.currentTime + Math.random() * 0.6;
@@ -647,32 +678,65 @@ function birdChirp() {
     o.start(st); o.stop(st + 0.15);
   }
 }
-function cricket() {
-  const t0 = ac.currentTime + Math.random() * 0.8;
-  const pulses = 5 + Math.floor(Math.random() * 3);
-  for (let i = 0; i < pulses; i++) {
-    const st = t0 + i * 0.05;
-    const o = ac.createOscillator(); o.type = 'triangle';
-    o.frequency.value = 4200 + Math.random() * 250;
-    const g = ac.createGain();
-    g.gain.setValueAtTime(0.0001, st);
-    g.gain.exponentialRampToValueAtTime(0.011, st + 0.008);
-    g.gain.exponentialRampToValueAtTime(0.0001, st + 0.04);
-    o.connect(g); g.connect(ac.destination);
-    o.start(st); o.stop(st + 0.045);
-  }
+/* 海浪：一次涌来又退去的浪声（每次时长/滤波/响度都随机，不重样） */
+function waveSwell() {
+  const t0 = ac.currentTime + 0.1;
+  const dur = 3.5 + Math.random() * 2.5;
+  const src = ac.createBufferSource(); src.buffer = _noise; src.loop = true;
+  const f = ac.createBiquadFilter(); f.type = 'lowpass';
+  f.frequency.setValueAtTime(420 + Math.random() * 320, t0);
+  f.frequency.exponentialRampToValueAtTime(170 + Math.random() * 60, t0 + dur);
+  const g = ac.createGain();
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(0.055 + Math.random() * 0.03, t0 + dur * (0.3 + Math.random() * 0.2));
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  src.connect(f); f.connect(g); g.connect(ac.destination);
+  src.start(t0); src.stop(t0 + dur + 0.1);
 }
-function owlHoot() {
-  const st = ac.currentTime + 0.2;
-  const o = ac.createOscillator(); o.type = 'sine';
-  o.frequency.setValueAtTime(340, st);
-  o.frequency.exponentialRampToValueAtTime(290, st + 0.28);
+/* 阵风：一阵吹过又停的风 */
+function windGust() {
+  const t0 = ac.currentTime + 0.1;
+  const dur = 2 + Math.random() * 2.2;
+  const src = ac.createBufferSource(); src.buffer = _noise; src.loop = true;
+  const f = ac.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 0.9;
+  const base = 300 + Math.random() * 260;
+  f.frequency.setValueAtTime(base, t0);
+  f.frequency.linearRampToValueAtTime(base * (1.5 + Math.random() * 0.8), t0 + dur * 0.45);
+  f.frequency.linearRampToValueAtTime(base * 0.7, t0 + dur);
+  const g = ac.createGain();
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(0.02 + Math.random() * 0.018, t0 + dur * 0.4);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  src.connect(f); f.connect(g); g.connect(ac.destination);
+  src.start(t0); src.stop(t0 + dur + 0.1);
+}
+/* 太空呼啸：某个东西从耳边掠过的低频扫风 */
+function spaceWhoosh() {
+  const t0 = ac.currentTime + Math.random() * 0.5;
+  const dur = 2.2 + Math.random() * 1.8;
+  const src = ac.createBufferSource(); src.buffer = _noise; src.loop = true;
+  const f = ac.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 1.6;
+  f.frequency.setValueAtTime(140 + Math.random() * 80, t0);
+  f.frequency.exponentialRampToValueAtTime(600 + Math.random() * 400, t0 + dur * 0.5);
+  f.frequency.exponentialRampToValueAtTime(120 + Math.random() * 60, t0 + dur);
+  const g = ac.createGain();
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(0.012 + Math.random() * 0.008, t0 + dur * 0.5);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  src.connect(f); f.connect(g); g.connect(ac.destination);
+  src.start(t0); src.stop(t0 + dur + 0.1);
+}
+/* 星之微响：一颗星星闪了一下的一声轻响（每次音高时长都不同） */
+function starPing() {
+  const st = ac.currentTime + Math.random() * 0.8;
+  const freq = 900 + Math.random() * 1100;
+  const o = ac.createOscillator(); o.type = 'sine'; o.frequency.value = freq;
   const g = ac.createGain();
   g.gain.setValueAtTime(0.0001, st);
-  g.gain.exponentialRampToValueAtTime(0.02, st + 0.06);
-  g.gain.exponentialRampToValueAtTime(0.0001, st + 0.34);
+  g.gain.exponentialRampToValueAtTime(0.006 + Math.random() * 0.005, st + 0.03);
+  g.gain.exponentialRampToValueAtTime(0.0001, st + 0.7 + Math.random() * 0.8);
   o.connect(g); g.connect(ac.destination);
-  o.start(st); o.stop(st + 0.36);
+  o.start(st); o.stop(st + 1.6);
 }
 
 /* ================= 概率：47.5% / 47.5% / 5% + 每10次保底1~2次or ================= */
