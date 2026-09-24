@@ -50,30 +50,32 @@
   #sky .planet { position: absolute; opacity: .85; animation: floatY ease-in-out infinite; }
   #sky .satellite { position: absolute; animation: crossSky linear infinite; }
   @keyframes crossSky { from { transform: translateX(-12vw) } to { transform: translateX(112vw) } }
+  /* 流星：自上而下坠落（右上 → 左下） */
   #sky .meteor {
     position: absolute; width: 130px; height: 2px; border-radius: 2px;
     background: linear-gradient(90deg, rgba(255,255,255,0), #fff);
-    transform: rotate(32deg); opacity: 0; animation: meteor 7s ease-out infinite;
+    transform: rotate(143deg); opacity: 0;
+    animation: meteorFall 7s ease-out infinite;
   }
-  @keyframes meteor {
-    0%   { transform: rotate(32deg) translateX(0);     opacity: 0; }
+  @keyframes meteorFall {
+    0%   { transform: rotate(143deg) translateX(0);    opacity: 0; }
     4%   { opacity: .95; }
-    16%  { transform: rotate(32deg) translateX(-46vw); opacity: 0; }
-    100% { transform: rotate(32deg) translateX(-46vw); opacity: 0; }
+    16%  { transform: rotate(143deg) translateX(52vw); opacity: 0; }
+    100% { transform: rotate(143deg) translateX(52vw); opacity: 0; }
   }
   @keyframes floatY { 0%,100%{ transform: translateY(0) } 50%{ transform: translateY(-14px) } }
 
   /* ================= 页面结构 ================= */
   .screen {
     position: absolute; inset: 0; z-index: 1;
-    display: flex; flex-direction: column;
+    display: flex; flex-direction: column; align-items: center;
     opacity: 0; pointer-events: none; transition: opacity .5s ease;
     padding: 24px;
   }
   .screen.active { opacity: 1; pointer-events: auto; }
 
   /* ---------- 第一页 ---------- */
-  #screen1 { justify-content: center; align-items: center; text-align: center; }
+  #screen1 { justify-content: center; text-align: center; }
   .intro-card {
     max-width: 540px; padding: 40px 34px; border-radius: 26px;
     background: var(--glass); border: 1px solid var(--glass-line);
@@ -87,29 +89,38 @@
   }
   .intro-card .em { color: var(--btn2); font-weight: 700; }
   body.night .intro-card .em { color: #ffc76a; }
-  .thanks { margin-top: 34px; font-size: 14px; color: var(--sub); animation: fadeInUp 1.2s .4s ease both; }
+  .thanks { margin-top: 30px; font-size: 14px; color: var(--sub); animation: fadeInUp 1.2s .3s ease both; text-align: center; }
   .veggie { display: inline-block; font-size: 20px; vertical-align: -3px; animation: wiggle 2.2s ease-in-out infinite; }
   @keyframes wiggle { 0%,100%{transform:rotate(-8deg)} 50%{transform:rotate(10deg) scale(1.12)} }
   @keyframes fadeInUp { from{opacity:0; transform:translateY(18px)} to{opacity:1; transform:translateY(0)} }
-  .next-btn {
-    position: absolute; right: 28px; bottom: 32px;
-    padding: 13px 36px; border: none; border-radius: 999px;
-    background: linear-gradient(135deg, var(--btn1), var(--btn2));
-    color: #fff; font-size: 17px; font-weight: 700; letter-spacing: 4px; cursor: pointer;
-    box-shadow: 0 8px 22px rgba(217,122,26,.4); transition: transform .15s;
+
+  #introCoin {
+    margin-top: 30px; width: 96px; height: 96px; cursor: pointer; user-select: none;
+    perspective: 600px; animation: fadeInUp 1s .5s ease both;
+    filter: drop-shadow(0 8px 14px rgba(20,20,40,.3));
+    transition: transform .15s;
   }
-  .next-btn:active { transform: scale(.94); }
+  #introCoin:hover { transform: scale(1.06); }
+  #introCoin:active { transform: scale(.95); }
+  #introCoin svg { width: 100%; height: 100%; }
+  #introCoin.flipping svg { animation: introSpin .9s cubic-bezier(.4,.1,.3,1) forwards; }
+  @keyframes introSpin { from { transform: rotateX(0) } to { transform: rotateX(1080deg) } }
+  .intro-hint { margin-top: 10px; font-size: 12.5px; color: var(--sub); animation: fadeInUp 1s .7s ease both; }
 
   /* ---------- 第二页 ---------- */
-  #screen2 { align-items: center; padding: 12px 24px 20px; }
-  #historyBtn {
-    position: absolute; top: 18px; right: 18px;
-    padding: 8px 16px; border-radius: 999px; border: 1px solid var(--glass-line);
-    background: var(--glass); color: var(--ink); font-size: 13px; cursor: pointer;
+  #screen2 { padding: 12px 16px 14px; overflow-y: auto; }
+  .topbtn {
+    position: absolute; top: 16px; z-index: 3;
+    padding: 8px 13px; border-radius: 999px; border: 1px solid var(--glass-line);
+    background: var(--glass); color: var(--ink); font-size: 14px; cursor: pointer;
     backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     box-shadow: 0 4px 14px rgba(0,0,0,.12); transition: transform .15s;
+    line-height: 1;
   }
-  #historyBtn:active { transform: scale(.94); }
+  .topbtn:active { transform: scale(.92); }
+  #soundBtn  { left: 14px; }
+  #themeBtn  { left: 58px; }
+  #historyBtn { right: 14px; font-size: 13px; }
 
   #bubble {
     min-height: 32px; margin: 46px auto 4px; width: fit-content; max-width: 320px;
@@ -121,7 +132,7 @@
   }
   #bubble.show { opacity: 1; }
 
-  .stage { position: relative; width: 100%; max-width: 420px; height: 320px; }
+  .stage { position: relative; width: 100%; max-width: 420px; height: 300px; flex-shrink: 0; }
 
   #coinWrap {
     position: absolute; top: 4px; left: 50%; margin-left: -78px;
@@ -130,9 +141,17 @@
   #coinWrap.tossing { animation: tossFly 1.15s cubic-bezier(.3,.1,.4,1) forwards; }
   @keyframes tossFly {
     0% { transform: translateY(0); }
-    44% { transform: translateY(-250px); }
-    56% { transform: translateY(-252px); }
+    44% { transform: translateY(-240px); }
+    56% { transform: translateY(-242px); }
     100% { transform: translateY(0); }
+  }
+  #coinWrap.bounce { animation: coinBounce .55s ease-out; }
+  @keyframes coinBounce {
+    0%   { transform: translateY(0)                 }
+    30%  { transform: translateY(-18px)             }
+    55%  { transform: translateY(0) scale(1.05,.95) }
+    75%  { transform: translateY(-7px)              }
+    100% { transform: translateY(0) scale(1,1)      }
   }
   #coinSvg { width: 100%; height: 100%; animation: idleFloat 4s ease-in-out infinite; }
   @keyframes idleFloat { 0%,100%{ transform: translateY(0) rotate(-2deg) } 50%{ transform: translateY(-8px) rotate(2deg) } }
@@ -142,16 +161,28 @@
   @keyframes orPulse { 0%,100%{ filter: drop-shadow(0 0 6px rgba(255,200,80,.5)) } 50%{ filter: drop-shadow(0 0 22px rgba(255,200,80,.95)) } }
 
   #hand {
-    position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
-    width: 240px; z-index: 1; filter: drop-shadow(0 8px 10px rgba(20,20,40,.25));
+    position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%);
+    width: 215px; z-index: 1; filter: drop-shadow(0 8px 10px rgba(20,20,40,.25));
   }
   #hand.flick { animation: flick .35s ease; }
   @keyframes flick { 0%{transform:translateX(-50%) translateY(0)} 45%{transform:translateX(-50%) translateY(-42px)} 100%{transform:translateX(-50%) translateY(0)} }
 
   #resultTip { min-height: 22px; font-size: 13.5px; color: var(--sub); text-align: center; margin-top: 2px; }
 
+  /* 摇完后的两个按钮 */
+  #afterBtns { display: none; gap: 10px; margin-top: 8px; }
+  #afterBtns.show { display: flex; }
+  #afterBtns button {
+    padding: 10px 20px; border-radius: 999px; font-size: 13.5px; cursor: pointer;
+    border: 1px solid var(--glass-line); background: var(--glass); color: var(--ink);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    transition: transform .15s, opacity .2s;
+  }
+  #afterBtns button:active { transform: scale(.94); }
+  #retryBtn { font-weight: 700; }
+
   #questionInput {
-    width: min(80vw, 380px); margin-top: 8px;
+    width: min(80vw, 380px); margin-top: 10px;
     padding: 13px 18px; border: 1px solid var(--glass-line); border-radius: 14px;
     font-size: 15px; background: var(--glass); color: var(--ink); outline: none;
     backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
@@ -181,25 +212,29 @@
 
   .privacy-note { margin-top: 10px; font-size: 11px; color: var(--sub); opacity: .85; }
 
-  /* ---------- 记录弹层 ---------- */
-  #recordsModal {
+  /* ---------- 侧滑历史抽屉 ---------- */
+  #drawerMask {
     position: fixed; inset: 0; z-index: 5; display: none;
-    align-items: center; justify-content: center;
-    background: rgba(10,10,25,.45); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    background: rgba(10,10,25,.45); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
   }
-  #recordsModal.open { display: flex; }
-  .modal-card {
-    width: min(92vw, 430px); max-height: 72vh; overflow-y: auto;
-    background: var(--glass); border: 1px solid var(--glass-line); border-radius: 22px;
-    padding: 18px 20px; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-    box-shadow: 0 24px 60px rgba(0,0,0,.3);
+  #drawerMask.open { display: block; }
+  #drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 6;
+    width: min(86vw, 350px);
+    background: var(--glass); border-left: 1px solid var(--glass-line);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    box-shadow: -12px 0 40px rgba(0,0,0,.25);
+    transform: translateX(105%); transition: transform .35s cubic-bezier(.3,.9,.3,1);
+    display: flex; flex-direction: column; padding: 18px;
   }
-  .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-  .modal-head h3 { font-size: 15px; }
-  .modal-head .btns button {
-    margin-left: 8px; font-size: 12px; padding: 4px 12px; border-radius: 999px; cursor: pointer;
+  #drawer.open { transform: translateX(0); }
+  .drawer-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .drawer-head h3 { font-size: 15px; }
+  .drawer-head .btns button {
+    margin-left: 8px; font-size: 12px; padding: 5px 12px; border-radius: 999px; cursor: pointer;
     border: 1px solid var(--glass-line); background: transparent; color: var(--ink);
   }
+  #historyList { overflow-y: auto; flex: 1; }
   .rec-card { border-top: 1px dashed var(--glass-line); padding: 9px 0; }
   .rec-q { font-size: 13px; font-weight: 600; word-break: break-all; }
   .rec-tosses { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
@@ -212,6 +247,20 @@
   body.night .chip.or { color: #cf9dff; }
   .rec-time { font-size: 10px; color: var(--sub); margin-top: 4px; }
   .empty-tip { font-size: 12px; color: var(--sub); text-align: center; padding: 14px 0; }
+
+  /* ---------- 移动端适配 ---------- */
+  @media (max-width: 480px) {
+    .screen { padding: 16px 14px 12px; }
+    .intro-card { padding: 28px 20px; border-radius: 20px; }
+    .intro-card p { font-size: 16.5px; line-height: 2.05; }
+    #introCoin { width: 80px; height: 80px; margin-top: 24px; }
+    .stage { height: 258px; }
+    #coinWrap { width: 126px; height: 126px; margin-left: -63px; }
+    #hand { width: 178px; }
+    #startBtn { padding: 12px 46px; font-size: 16px; }
+    #questionInput, #customBox { width: 100%; }
+    #soundBtn { left: 10px; } #themeBtn { left: 52px; } #historyBtn { right: 10px; }
+  }
 </style>
 </head>
 <body>
@@ -229,12 +278,29 @@
     </p>
   </div>
   <p class="thanks">在此特别感谢我的朋友 <span class="veggie">🥗</span> 先生的帮助。</p>
-  <button class="next-btn" onclick="goNext()">下一步</button>
+  <div id="introCoin" onclick="introFlip(event)">
+    <svg viewBox="0 0 120 120">
+      <polygon points="60,3 109,31.5 109,88.5 60,117 11,88.5 11,31.5"
+               fill="url(#goldRim)" stroke="#8a5a0c" stroke-width="2" stroke-linejoin="round"/>
+      <polygon points="60,10 103,35 103,85 60,110 17,85 17,35"
+               fill="url(#goldFace)" stroke="#c98a1d" stroke-width="1.2" stroke-linejoin="round"/>
+      <ellipse cx="45" cy="52" rx="5" ry="6.4" fill="#4a2f0a"/>
+      <ellipse cx="75" cy="52" rx="5" ry="6.4" fill="#4a2f0a"/>
+      <circle cx="46.7" cy="49.8" r="2" fill="#fff"/>
+      <circle cx="76.7" cy="49.8" r="2" fill="#fff"/>
+      <circle cx="35" cy="63" r="5.2" fill="#ff9d6b" opacity=".5"/>
+      <circle cx="85" cy="63" r="5.2" fill="#ff9d6b" opacity=".5"/>
+      <path d="M53 67 q2.5 3 5 0 q2.5 3 5 0" stroke="#4a2f0a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="intro-hint">👆 点击硬币，翻开下一页</div>
 </div>
 
 <!-- ============ 第二页：抛硬币 ============ -->
 <div id="screen2" class="screen">
-  <button id="historyBtn" onclick="openRecords()">📜 记录</button>
+  <button id="soundBtn"  class="topbtn" onclick="toggleSound()">🔊</button>
+  <button id="themeBtn"  class="topbtn" onclick="toggleTheme()">☀️</button>
+  <button id="historyBtn" class="topbtn" onclick="openDrawer()">📜 记录</button>
   <div id="bubble"></div>
 
   <div class="stage">
@@ -264,7 +330,6 @@
           <polygon points="60,16 98,38 98,82 60,104 22,82 22,38"
                    fill="none" stroke="#fff4cd" stroke-width="1.4" stroke-linejoin="round"
                    stroke-dasharray="3.5 3" opacity=".85"/>
-          <!-- 四角雕花 -->
           <g stroke="#a06a14" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".75">
             <path d="M26 40 q6 -8 14 -10"/><path d="M28 44 q5 -6 11 -8"/>
             <path d="M94 40 q-6 -8 -14 -10"/><path d="M92 44 q-5 -6 -11 -8"/>
@@ -272,7 +337,6 @@
             <path d="M94 80 q-6 8 -14 10"/><path d="M92 76 q-5 6 -11 8"/>
           </g>
           <path d="M30 30 Q42 18 58 15" stroke="#fffdf2" stroke-width="4" fill="none" stroke-linecap="round" opacity=".8"/>
-          <!-- 待机：可爱脸 -->
           <g id="idleFace">
             <ellipse cx="45" cy="52" rx="5" ry="6.4" fill="#4a2f0a"/>
             <ellipse cx="75" cy="52" rx="5" ry="6.4" fill="#4a2f0a"/>
@@ -282,7 +346,6 @@
             <circle cx="85" cy="63" r="5.2" fill="#ff9d6b" opacity=".5"/>
             <path d="M53 67 q2.5 3 5 0 q2.5 3 5 0" stroke="#4a2f0a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
           </g>
-          <!-- 答案刻字：YES -->
           <g id="engraveYes" visibility="hidden">
             <text x="60" y="70" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
                   font-size="29" font-weight="bold" letter-spacing="2" fill="#ffefc2">YES</text>
@@ -290,7 +353,6 @@
                   font-size="29" font-weight="bold" letter-spacing="2" fill="#7a4d0a">YES</text>
             <path d="M40 80 Q60 88 80 80" stroke="#a06a14" stroke-width="1.6" fill="none" stroke-linecap="round"/>
           </g>
-          <!-- 答案刻字：NO -->
           <g id="engraveNo" visibility="hidden">
             <text x="60" y="70" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
                   font-size="31" font-weight="bold" letter-spacing="3" fill="#ffefc2">NO</text>
@@ -298,7 +360,6 @@
                   font-size="31" font-weight="bold" letter-spacing="3" fill="#7a4d0a">NO</text>
             <path d="M40 80 Q60 88 80 80" stroke="#a06a14" stroke-width="1.6" fill="none" stroke-linecap="round"/>
           </g>
-          <!-- 答案刻字：or（边缘之答案） -->
           <g id="engraveOr" visibility="hidden">
             <text x="60" y="71" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
                   font-size="33" font-weight="bold" font-style="italic" fill="#ffefc2">or</text>
@@ -310,71 +371,102 @@
         </g>
       </svg>
     </div>
-    <!-- 手：彩色手指木偶款 -->
+    <!-- 手：纤细手指木偶款 -->
     <div id="hand">
       <svg viewBox="0 0 220 170">
-        <path d="M62 92 Q56 74 70 66 L158 66 Q172 72 168 96 L162 132 Q136 156 108 154 Q76 150 68 128 Z"
+        <rect x="88"  y="40" width="15" height="60" rx="7.5" fill="#ffe3bd" stroke="#e8b98a" stroke-width="2"/>
+        <rect x="110" y="30" width="15" height="70" rx="7.5" fill="#ffe3bd" stroke="#e8b98a" stroke-width="2"/>
+        <rect x="132" y="36" width="15" height="64" rx="7.5" fill="#ffe3bd" stroke="#e8b98a" stroke-width="2"/>
+        <rect x="154" y="48" width="13" height="52" rx="6.5" fill="#ffe3bd" stroke="#e8b98a" stroke-width="2"/>
+        <path d="M84 96 Q80 78 96 72 L146 72 Q160 78 158 100 L154 134 Q132 156 106 154 Q88 150 84 128 Z"
               fill="#ffe3bd" stroke="#e8b98a" stroke-width="2.5" stroke-linejoin="round"/>
-        <rect x="72"  y="22" width="24" height="62" rx="12" fill="#4aa08a" stroke="#357a68" stroke-width="2"/>
-        <rect x="100" y="12" width="25" height="72" rx="12.5" fill="#5b8fd6" stroke="#3f6ca8" stroke-width="2"/>
-        <rect x="129" y="16" width="25" height="68" rx="12.5" fill="#e06b5d" stroke="#a84a3f" stroke-width="2"/>
-        <rect x="158" y="28" width="23" height="56" rx="11.5" fill="#3a3a3a" stroke="#222" stroke-width="2"/>
-        <circle cx="80"  cy="42" r="2.4" fill="#12332b"/><circle cx="89"  cy="42" r="2.4" fill="#12332b"/>
-        <circle cx="84.5" cy="49" r="3" fill="#12332b"/>
-        <path d="M107 40 q3 -3 6 0" stroke="#1d3f6e" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <path d="M113 40 q3 -3 6 0" stroke="#1d3f6e" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <path d="M110 48 q3 2.5 6 0" stroke="#1d3f6e" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <circle cx="137" cy="40" r="2.4" fill="#5e231c"/><circle cx="146" cy="40" r="2.4" fill="#5e231c"/>
-        <path d="M137 48 q4.5 4 9 0" stroke="#5e231c" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <circle cx="165" cy="46" r="2.2" fill="#ddd"/><circle cx="174" cy="46" r="2.2" fill="#ddd"/>
-        <path d="M165 54 q4.5 3 9 0" stroke="#ddd" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <path d="M62 108 Q40 102 36 88 Q34 78 44 78 Q54 80 60 94 Z"
-              fill="#f0c14b" stroke="#c1932e" stroke-width="2" stroke-linejoin="round"/>
-        <path d="M44 86 l1 2.5 2.5 1 -2.5 1 -1 2.5 -1 -2.5 -2.5 -1 2.5 -1 z" fill="#fff3cf"/>
-        <path d="M52 92 l0.8 2 2 0.8 -2 0.8 -0.8 2 -0.8 -2 -2 -0.8 2 -0.8 z" fill="#fff3cf"/>
-        <path d="M92 112 Q110 122 134 112" stroke="#e8b98a" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <path d="M96 126 Q112 133 130 126" stroke="#e8b98a" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".7"/>
-        <ellipse cx="84" cy="120" rx="6" ry="4" fill="#ffb9a0" opacity=".55"/>
-        <ellipse cx="146" cy="120" rx="6" ry="4" fill="#ffb9a0" opacity=".55"/>
+        <rect x="85.5"  y="26" width="20" height="36" rx="10" fill="#4aa08a" stroke="#357a68" stroke-width="2"/>
+        <rect x="107.5" y="14" width="20" height="40" rx="10" fill="#5b8fd6" stroke="#3f6ca8" stroke-width="2"/>
+        <rect x="129.5" y="22" width="20" height="36" rx="10" fill="#e06b5d" stroke="#a84a3f" stroke-width="2"/>
+        <rect x="151"   y="38" width="17" height="26" rx="8.5" fill="#3a3a3a" stroke="#222" stroke-width="2"/>
+        <circle cx="92" cy="40" r="2.1" fill="#12332b"/><circle cx="99" cy="40" r="2.1" fill="#12332b"/>
+        <circle cx="95.5" cy="47" r="2.6" fill="#12332b"/>
+        <circle cx="113.5" cy="30" r="2.3" fill="#1d3f6e"/><circle cx="121.5" cy="30" r="2.3" fill="#1d3f6e"/>
+        <path d="M113 38 q4.5 3.5 9 0" stroke="#1d3f6e" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M135 34 q3 -3 6 0" stroke="#5e231c" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M141 34 q3 -3 6 0" stroke="#5e231c" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M135 42 q6 4 12 0" stroke="#5e231c" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <circle cx="156.5" cy="48" r="1.8" fill="#ddd"/><circle cx="162.5" cy="48" r="1.8" fill="#ddd"/>
+        <g transform="rotate(-24 50 108)">
+          <rect x="34" y="100" width="34" height="17" rx="8.5" fill="#f0c14b" stroke="#c1932e" stroke-width="2"/>
+          <path d="M46 104 l1 2.5 2.5 1 -2.5 1 -1 2.5 -1 -2.5 -2.5 -1 2.5 -1 z" fill="#fff3cf"/>
+          <path d="M56 107 l0.8 2 2 0.8 -2 0.8 -0.8 2 -0.8 -2 -2 -0.8 2 -0.8 z" fill="#fff3cf"/>
+        </g>
+        <path d="M96 112 Q112 120 134 112" stroke="#e8b98a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <path d="M100 126 Q114 132 130 126" stroke="#e8b98a" stroke-width="1.4" fill="none" stroke-linecap="round" opacity=".7"/>
       </svg>
     </div>
   </div>
 
   <div id="resultTip"></div>
 
+  <div id="afterBtns">
+    <button id="retryBtn" onclick="startToss()">🔄 再抛一次</button>
+    <button id="shareBtn" onclick="copyShare()">📋 复制分享结果</button>
+  </div>
+
   <input id="questionInput" type="text" maxlength="50" placeholder="写下你的纠结，硬币给你个参考意见～" autocomplete="off">
   <button id="startBtn" onclick="startToss()">开始</button>
 
   <div id="customToggle" onclick="toggleCustom()">⚙️ 我有两个自己的选项（可选）</div>
   <div id="customBox">
-    <input id="optA" type="text" maxlength="12" placeholder="选项 A，比如：去" autocomplete="off">
-    <input id="optB" type="text" maxlength="12" placeholder="选项 B，比如：不去" autocomplete="off">
+    <input id="optA" type="text" maxlength="12" placeholder="选项 A（对应 YES）" autocomplete="off">
+    <input id="optB" type="text" maxlength="12" placeholder="选项 B（对应 NO）" autocomplete="off">
   </div>
 
   <div class="privacy-note">🔒 记录只存在你自己的设备上，别人看不到</div>
 </div>
 
-<!-- ============ 记录弹层 ============ -->
-<div id="recordsModal">
-  <div class="modal-card">
-    <div class="modal-head">
-      <h3>📜 我的抉择记录</h3>
-      <div class="btns">
-        <button onclick="clearRecords()">清空</button>
-        <button onclick="closeRecords()">✕ 关闭</button>
-      </div>
+<!-- ============ 侧滑历史抽屉 ============ -->
+<div id="drawerMask" onclick="closeDrawer()"></div>
+<div id="drawer">
+  <div class="drawer-head">
+    <h3>📜 我的抉择记录</h3>
+    <div class="btns">
+      <button onclick="clearRecords()">清空全部</button>
+      <button onclick="closeDrawer()">✕</button>
     </div>
-    <div id="historyList"></div>
   </div>
+  <div id="historyList"></div>
 </div>
 
 <script>
-/* ================= 场景：真实昼夜 + 随机天气 / 夜晚外太空 ================= */
+/* ================= 主题 & 音效偏好（本地记忆） ================= */
+let soundOn = localStorage.getItem('hexcoin_sound') !== 'off';
+let themePref = localStorage.getItem('hexcoin_theme') || ''; // '' = 跟随时间
+
+function toggleSound() {
+  soundOn = !soundOn;
+  localStorage.setItem('hexcoin_sound', soundOn ? 'on' : 'off');
+  document.getElementById('soundBtn').textContent = soundOn ? '🔊' : '🔇';
+  bubble(soundOn ? '音效已开启 🔊' : '音效已关闭 🔇');
+}
+function toggleTheme() {
+  const isNight = document.body.classList.contains('night');
+  themePref = isNight ? 'day' : 'night';
+  localStorage.setItem('hexcoin_theme', themePref);
+  initScene();
+  bubble(isNight ? '已切换到白天 ☀️' : '已切换到夜晚 🌙');
+}
+
+/* ================= 场景：昼夜 + 随机天气 / 夜晚外太空 ================= */
 function initScene() {
   const hour = new Date().getHours();
-  const isDay = hour >= 6 && hour < 18;
+  let isDay;
+  if (themePref === 'day') isDay = true;
+  else if (themePref === 'night') isDay = false;
+  else isDay = hour >= 6 && hour < 18;
+
   const sky = document.getElementById('sky');
+  sky.innerHTML = '';
   document.body.classList.remove('day', 'night', 'cloudy', 'overcast');
+  document.getElementById('themeBtn').textContent = isDay ? '🌙' : '☀️';
+
   if (isDay) {
     const variants = ['sunny', 'cloudy', 'overcast'];
     const v = variants[Math.floor(Math.random() * variants.length)];
@@ -447,7 +539,7 @@ function buildNight(sky) {
   sat.innerHTML = satelliteSVG();
   [0, 2.4, 4.8].forEach((delay, i) => {
     el(sky, 'meteor', {
-      top: (8 + i * 14) + '%', right: (10 + i * 22) + '%',
+      top: (5 + i * 9) + '%', left: (46 + i * 14) + '%',
       animationDelay: -delay + 's',
     });
   });
@@ -456,6 +548,7 @@ function buildNight(sky) {
 /* ================= 音效（Web Audio 合成） ================= */
 let ac = null, _noise = null;
 function ensureAudio() {
+  if (!soundOn) return false;
   if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
   if (ac.state === 'suspended') ac.resume();
   if (!_noise) {
@@ -463,8 +556,10 @@ function ensureAudio() {
     const d = _noise.getChannelData(0);
     for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
   }
+  return true;
 }
 function whoosh(up) {
+  if (!ensureAudio()) return;
   const t = ac.currentTime;
   const src = ac.createBufferSource(); src.buffer = _noise; src.loop = true;
   const f = ac.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 1.4;
@@ -478,6 +573,7 @@ function whoosh(up) {
   src.start(t); src.stop(t + 0.4);
 }
 function flipTick(delay, pitch) {
+  if (!ensureAudio()) return;
   const t = ac.currentTime + delay;
   const o = ac.createOscillator(); o.type = 'square'; o.frequency.value = pitch;
   const g = ac.createGain();
@@ -487,6 +583,7 @@ function flipTick(delay, pitch) {
   o.start(t); o.stop(t + 0.06);
 }
 function thud() {
+  if (!ensureAudio()) return;
   const t = ac.currentTime;
   const o = ac.createOscillator(); o.type = 'sine';
   o.frequency.setValueAtTime(170, t);
@@ -544,8 +641,8 @@ function renderHistory() {
 function escapeHtml(s) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
-function openRecords()  { renderHistory(); document.getElementById('recordsModal').classList.add('open'); }
-function closeRecords() { document.getElementById('recordsModal').classList.remove('open'); }
+function openDrawer()  { renderHistory(); document.getElementById('drawerMask').classList.add('open'); document.getElementById('drawer').classList.add('open'); }
+function closeDrawer() { document.getElementById('drawerMask').classList.remove('open'); document.getElementById('drawer').classList.remove('open'); }
 
 /* ================= 气泡与台词 ================= */
 const bubbleEl = document.getElementById('bubble');
@@ -570,10 +667,20 @@ const tipFns = {
   or:  L => `硬币立了起来——or：都要，或者都不要 😏`,
 };
 
-/* ================= 页面切换 ================= */
+/* ================= 页面切换 & 开场仪式 ================= */
 function goNext() {
   document.getElementById('screen1').classList.remove('active');
   document.getElementById('screen2').classList.add('active');
+}
+function introFlip(e) {
+  const coin = document.getElementById('introCoin');
+  if (coin.classList.contains('flipping')) return;
+  coin.classList.add('flipping');
+  if (ensureAudio()) {
+    let d = 0;
+    for (let i = 0; i < 8; i++) { flipTick(d, 900 + Math.random() * 400); d += 0.09; }
+  }
+  setTimeout(goNext, 850);
 }
 
 /* ================= 自定义两个选项 ================= */
@@ -590,7 +697,9 @@ const hand = document.getElementById('hand');
 const tipEl = document.getElementById('resultTip');
 const startBtn = document.getElementById('startBtn');
 const input = document.getElementById('questionInput');
+const afterBtns = document.getElementById('afterBtns');
 let tossing = false;
+let lastShare = null;
 
 function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
 function showFace(id) {
@@ -606,13 +715,15 @@ async function startToss() {
   const a = document.getElementById('optA').value.trim();
   const b = document.getElementById('optB').value.trim();
   if ((a && !b) || (!a && b)) { bubble('两个选项要么都填，要么都不填哦 🙃'); return; }
-  if (tossing) return;
-  tossing = true; startBtn.disabled = true;
+  if (tossing) return;               // 动画期间禁止重复点击
+  tossing = true;
+  startBtn.disabled = true;
+  afterBtns.classList.remove('show');
   ensureAudio();
 
   tipEl.textContent = '';
   showFace('idleFace');
-  coinWrap.classList.remove('orGlow');
+  coinWrap.classList.remove('orGlow', 'bounce');
   bubble(wittyStart[Math.floor(Math.random() * wittyStart.length)]);
   await wait(900);
 
@@ -631,8 +742,10 @@ async function startToss() {
 
   coinWrap.classList.remove('tossing');
   coinWrap.classList.remove('spinning');
+  coinWrap.classList.add('bounce');
   hand.classList.remove('flick');
   thud();
+  setTimeout(() => coinWrap.classList.remove('bounce'), 600);
 
   const rs = loadRecords();
   const prev = rs.find(r => r.q === qText);
@@ -645,6 +758,9 @@ async function startToss() {
   else showFace('engraveOr');
   tipEl.textContent = tipFns[result](labels);
 
+  lastShare = { q: qText, label: labels[result], r: result };
+  afterBtns.classList.add('show');
+
   const t = rec.tosses;
   if (t.length >= 3 && t.slice(-3).every(x => x.r === result)) {
     setTimeout(() => bubble(dizzyMsg, true), 700);
@@ -653,6 +769,31 @@ async function startToss() {
   tossing = false; startBtn.disabled = false;
 }
 
+/* ================= 复制分享 ================= */
+function copyShare() {
+  if (!lastShare) return;
+  const link = location.href.split('#')[0];
+  const emoji = lastShare.r === 'yes' ? '✅' : (lastShare.r === 'no' ? '❌' : '🎲');
+  const text = `我在「抉择硬币」问：「${lastShare.q}」，硬币给出的参考意见是：${lastShare.label} ${emoji}\n你也来问问吧 → ${link}`;
+  const done = () => bubble('已复制，去分享吧 📋');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+function fallbackCopy(text, done) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); done(); } catch (e) { bubble('复制失败，长按手动复制吧'); }
+  document.body.removeChild(ta);
+}
+
+/* ================= 初始化 ================= */
+document.getElementById('soundBtn').textContent = soundOn ? '🔊' : '🔇';
 initScene();
 </script>
 </body>
