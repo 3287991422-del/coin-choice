@@ -327,15 +327,8 @@
                    fill="url(#goldRim)" stroke="#8a5a0c" stroke-width="2" stroke-linejoin="round"/>
           <polygon points="60,10 103,35 103,85 60,110 17,85 17,35"
                    fill="url(#goldFace)" stroke="#c98a1d" stroke-width="1.2" stroke-linejoin="round"/>
-          <polygon points="60,16 98,38 98,82 60,104 22,82 22,38"
-                   fill="none" stroke="#fff4cd" stroke-width="1.4" stroke-linejoin="round"
-                   stroke-dasharray="3.5 3" opacity=".85"/>
-          <g stroke="#a06a14" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".75">
-            <path d="M26 40 q6 -8 14 -10"/><path d="M28 44 q5 -6 11 -8"/>
-            <path d="M94 40 q-6 -8 -14 -10"/><path d="M92 44 q-5 -6 -11 -8"/>
-            <path d="M26 80 q6 8 14 10"/><path d="M28 76 q5 6 11 8"/>
-            <path d="M94 80 q-6 8 -14 10"/><path d="M92 76 q-5 6 -11 8"/>
-          </g>
+          <polygon points="60,15 99,37.5 99,82.5 60,105 21,82.5 21,37.5"
+                   fill="none" stroke="#fff2c4" stroke-width="1.2" stroke-linejoin="round" opacity=".55"/>
           <path d="M30 30 Q42 18 58 15" stroke="#fffdf2" stroke-width="4" fill="none" stroke-linecap="round" opacity=".8"/>
           <g id="idleFace">
             <ellipse cx="45" cy="52" rx="5" ry="6.4" fill="#4a2f0a"/>
@@ -371,34 +364,42 @@
         </g>
       </svg>
     </div>
-    <!-- 手：纤细手指木偶款 -->
+    <!-- 手：纤细手指木偶款（指掌相连 + 袖口） -->
     <div id="hand">
-      <svg viewBox="0 0 220 170">
-        <rect x="88"  y="40" width="15" height="60" rx="7.5" fill="#ffe3bd" stroke="#e8b98a" stroke-width="2"/>
-        <rect x="110" y="30" width="15" height="70" rx="7.5" fill="#ffe3bd" stroke="#e8b98a" stroke-width="2"/>
-        <rect x="132" y="36" width="15" height="64" rx="7.5" fill="#ffe3bd" stroke="#e8b98a" stroke-width="2"/>
-        <rect x="154" y="48" width="13" height="52" rx="6.5" fill="#ffe3bd" stroke="#e8b98a" stroke-width="2"/>
-        <path d="M84 96 Q80 78 96 72 L146 72 Q160 78 158 100 L154 134 Q132 156 106 154 Q88 150 84 128 Z"
-              fill="#ffe3bd" stroke="#e8b98a" stroke-width="2.5" stroke-linejoin="round"/>
-        <rect x="85.5"  y="26" width="20" height="36" rx="10" fill="#4aa08a" stroke="#357a68" stroke-width="2"/>
-        <rect x="107.5" y="14" width="20" height="40" rx="10" fill="#5b8fd6" stroke="#3f6ca8" stroke-width="2"/>
-        <rect x="129.5" y="22" width="20" height="36" rx="10" fill="#e06b5d" stroke="#a84a3f" stroke-width="2"/>
-        <rect x="151"   y="38" width="17" height="26" rx="8.5" fill="#3a3a3a" stroke="#222" stroke-width="2"/>
-        <circle cx="92" cy="40" r="2.1" fill="#12332b"/><circle cx="99" cy="40" r="2.1" fill="#12332b"/>
-        <circle cx="95.5" cy="47" r="2.6" fill="#12332b"/>
-        <circle cx="113.5" cy="30" r="2.3" fill="#1d3f6e"/><circle cx="121.5" cy="30" r="2.3" fill="#1d3f6e"/>
-        <path d="M113 38 q4.5 3.5 9 0" stroke="#1d3f6e" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <path d="M135 34 q3 -3 6 0" stroke="#5e231c" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <path d="M141 34 q3 -3 6 0" stroke="#5e231c" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <path d="M135 42 q6 4 12 0" stroke="#5e231c" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <circle cx="156.5" cy="48" r="1.8" fill="#ddd"/><circle cx="162.5" cy="48" r="1.8" fill="#ddd"/>
-        <g transform="rotate(-24 50 108)">
-          <rect x="34" y="100" width="34" height="17" rx="8.5" fill="#f0c14b" stroke="#c1932e" stroke-width="2"/>
-          <path d="M46 104 l1 2.5 2.5 1 -2.5 1 -1 2.5 -1 -2.5 -2.5 -1 2.5 -1 z" fill="#fff3cf"/>
-          <path d="M56 107 l0.8 2 2 0.8 -2 0.8 -0.8 2 -0.8 -2 -2 -0.8 2 -0.8 z" fill="#fff3cf"/>
+      <svg viewBox="0 0 220 192">
+        <!-- 袖口（手腕） -->
+        <rect x="90" y="164" width="56" height="26" rx="12" fill="#ffdcb0" stroke="#e0a878" stroke-width="2.5"/>
+        <!-- 拇指（先画，基部被手掌盖住，自然相连） -->
+        <g transform="rotate(-26 66 118)">
+          <rect x="56" y="94" width="14" height="48" rx="7" fill="#ffe6c4" stroke="#eab08a" stroke-width="2"/>
+          <rect x="50" y="80" width="26" height="32" rx="13" fill="#f0c14b" stroke="#c1932e" stroke-width="2"/>
+          <path d="M60 88 l1.2 3 3 1.2 -3 1.2 -1.2 3 -1.2 -3 -3 -1.2 3 -1.2 z" fill="#fff3cf"/>
+          <path d="M69 94 l0.8 2 2 0.8 -2 0.8 -0.8 2 -0.8 -2 -2 -0.8 2 -0.8 z" fill="#fff3cf"/>
         </g>
-        <path d="M96 112 Q112 120 134 112" stroke="#e8b98a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-        <path d="M100 126 Q114 132 130 126" stroke="#e8b98a" stroke-width="1.4" fill="none" stroke-linecap="round" opacity=".7"/>
+        <!-- 四根手指（下半截伸进手掌里） -->
+        <rect x="77"  y="54" width="17" height="66" rx="8.5" fill="#ffe6c4" stroke="#eab08a" stroke-width="2"/>
+        <rect x="99"  y="40" width="17" height="80" rx="8.5" fill="#ffe6c4" stroke="#eab08a" stroke-width="2"/>
+        <rect x="121" y="48" width="17" height="72" rx="8.5" fill="#ffe6c4" stroke="#eab08a" stroke-width="2"/>
+        <rect x="143" y="62" width="15" height="58" rx="7.5" fill="#ffe6c4" stroke="#eab08a" stroke-width="2"/>
+        <!-- 手掌（后画，盖住指根连接处） -->
+        <path d="M74 108 Q74 96 86 96 L148 96 Q160 96 160 108 L158 134 Q152 166 117 169 Q82 166 76 134 Z"
+              fill="#ffe6c4" stroke="#eab08a" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M92 118 Q110 126 138 118" stroke="#eab08a" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".8"/>
+        <!-- 彩色木偶套：绿 / 蓝 / 红 / 黑 -->
+        <rect x="74"  y="40" width="23" height="34" rx="11.5" fill="#4aa08a" stroke="#357a68" stroke-width="2"/>
+        <rect x="96"  y="26" width="23" height="38" rx="11.5" fill="#5b8fd6" stroke="#3f6ca8" stroke-width="2"/>
+        <rect x="118" y="34" width="23" height="34" rx="11.5" fill="#e06b5d" stroke="#a84a3f" stroke-width="2"/>
+        <rect x="141" y="50" width="19" height="26" rx="9.5" fill="#3a3a3a" stroke="#222" stroke-width="2"/>
+        <!-- 表情 -->
+        <circle cx="81.5" cy="52" r="2" fill="#12332b"/><circle cx="89.5" cy="52" r="2" fill="#12332b"/>
+        <path d="M81 59 q4 3 8 0" stroke="#12332b" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <circle cx="104" cy="40" r="2.2" fill="#1d3f6e"/><circle cx="112" cy="40" r="2.2" fill="#1d3f6e"/>
+        <path d="M103.5 48 q4.5 3.5 9 0" stroke="#1d3f6e" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <circle cx="131.5" cy="46" r="2" fill="#5e231c"/><circle cx="139.5" cy="46" r="2" fill="#5e231c"/>
+        <path d="M128.5 40.5 l5.5 2.2" stroke="#5e231c" stroke-width="2" stroke-linecap="round"/>
+        <path d="M142.5 40.5 l-5.5 2.2" stroke="#5e231c" stroke-width="2" stroke-linecap="round"/>
+        <path d="M132 53 q3.5 2.5 7 0" stroke="#5e231c" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <circle cx="148.5" cy="59" r="1.8" fill="#ddd"/><circle cx="153.5" cy="59" r="1.8" fill="#ddd"/>
       </svg>
     </div>
   </div>
@@ -444,13 +445,16 @@ function toggleSound() {
   soundOn = !soundOn;
   localStorage.setItem('hexcoin_sound', soundOn ? 'on' : 'off');
   document.getElementById('soundBtn').textContent = soundOn ? '🔊' : '🔇';
+  if (soundOn) startAmbience(); else stopAmbience();
   bubble(soundOn ? '音效已开启 🔊' : '音效已关闭 🔇');
 }
 function toggleTheme() {
   const isNight = document.body.classList.contains('night');
   themePref = isNight ? 'day' : 'night';
   localStorage.setItem('hexcoin_theme', themePref);
+  stopAmbience();
   initScene();
+  if (soundOn) startAmbience();
   bubble(isNight ? '已切换到白天 ☀️' : '已切换到夜晚 🌙');
 }
 
@@ -595,6 +599,82 @@ function thud() {
   o.start(t); o.stop(t + 0.3);
 }
 
+/* ================= 昼夜环境音（白天鸟鸣+微风 / 夜晚虫鸣+夜风） ================= */
+let ambTimer = null, windSrc = null, windGain = null;
+function startAmbience() {
+  if (!soundOn) return;
+  if (!ensureAudio()) return;
+  if (ambTimer) return;
+  // 持续的底噪风声（很轻）
+  windSrc = ac.createBufferSource(); windSrc.buffer = _noise; windSrc.loop = true;
+  const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 240;
+  windGain = ac.createGain();
+  windGain.gain.value = document.body.classList.contains('night') ? 0.008 : 0.016;
+  windSrc.connect(f); f.connect(windGain); windGain.connect(ac.destination);
+  windSrc.start();
+  // 周期性点缀：白天鸟叫，夜晚虫鸣
+  scheduleAmb();
+  ambTimer = setInterval(scheduleAmb, 3000);
+}
+function stopAmbience() {
+  if (ambTimer) { clearInterval(ambTimer); ambTimer = null; }
+  if (windSrc) { try { windSrc.stop(); } catch (e) {} windSrc = null; windGain = null; }
+}
+function scheduleAmb() {
+  if (!soundOn || !ac || ac.state !== 'running') return;
+  if (document.body.classList.contains('night')) {
+    cricket();
+    if (Math.random() < 0.22) owlHoot();
+  } else {
+    if (Math.random() < 0.75) birdChirp();
+  }
+}
+function birdChirp() {
+  const t0 = ac.currentTime + Math.random() * 0.6;
+  const notes = 2 + Math.floor(Math.random() * 3);
+  for (let i = 0; i < notes; i++) {
+    const base = 2200 + Math.random() * 900;
+    const st = t0 + i * (0.13 + Math.random() * 0.06);
+    const o = ac.createOscillator(); o.type = 'sine';
+    o.frequency.setValueAtTime(base, st);
+    o.frequency.exponentialRampToValueAtTime(base * 1.5, st + 0.05);
+    o.frequency.exponentialRampToValueAtTime(base * 0.85, st + 0.11);
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0.0001, st);
+    g.gain.exponentialRampToValueAtTime(0.022, st + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, st + 0.13);
+    o.connect(g); g.connect(ac.destination);
+    o.start(st); o.stop(st + 0.15);
+  }
+}
+function cricket() {
+  const t0 = ac.currentTime + Math.random() * 0.8;
+  const pulses = 5 + Math.floor(Math.random() * 3);
+  for (let i = 0; i < pulses; i++) {
+    const st = t0 + i * 0.05;
+    const o = ac.createOscillator(); o.type = 'triangle';
+    o.frequency.value = 4200 + Math.random() * 250;
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0.0001, st);
+    g.gain.exponentialRampToValueAtTime(0.011, st + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001, st + 0.04);
+    o.connect(g); g.connect(ac.destination);
+    o.start(st); o.stop(st + 0.045);
+  }
+}
+function owlHoot() {
+  const st = ac.currentTime + 0.2;
+  const o = ac.createOscillator(); o.type = 'sine';
+  o.frequency.setValueAtTime(340, st);
+  o.frequency.exponentialRampToValueAtTime(290, st + 0.28);
+  const g = ac.createGain();
+  g.gain.setValueAtTime(0.0001, st);
+  g.gain.exponentialRampToValueAtTime(0.02, st + 0.06);
+  g.gain.exponentialRampToValueAtTime(0.0001, st + 0.34);
+  o.connect(g); g.connect(ac.destination);
+  o.start(st); o.stop(st + 0.36);
+}
+
 /* ================= 概率：47.5% / 47.5% / 5% + 每10次保底1~2次or ================= */
 function rollResult(history) {
   const last9 = history.slice(-9);
@@ -676,6 +756,7 @@ function introFlip(e) {
   const coin = document.getElementById('introCoin');
   if (coin.classList.contains('flipping')) return;
   coin.classList.add('flipping');
+  startAmbience();
   if (ensureAudio()) {
     let d = 0;
     for (let i = 0; i < 8; i++) { flipTick(d, 900 + Math.random() * 400); d += 0.09; }
@@ -758,7 +839,7 @@ async function startToss() {
   else showFace('engraveOr');
   tipEl.textContent = tipFns[result](labels);
 
-  lastShare = { q: qText, label: labels[result], r: result };
+  lastShare = { q: qText, labels, r: result };
   afterBtns.classList.add('show');
 
   const t = rec.tosses;
@@ -769,12 +850,13 @@ async function startToss() {
   tossing = false; startBtn.disabled = false;
 }
 
-/* ================= 复制分享 ================= */
+/* ================= 复制分享（固定模板） ================= */
 function copyShare() {
   if (!lastShare) return;
-  const link = location.href.split('#')[0];
-  const emoji = lastShare.r === 'yes' ? '✅' : (lastShare.r === 'no' ? '❌' : '🎲');
-  const text = `我在「抉择硬币」问：「${lastShare.q}」，硬币给出的参考意见是：${lastShare.label} ${emoji}\n你也来问问吧 → ${link}`;
+  const { q, labels, r } = lastShare;
+  const mark = r === 'yes' ? '✔' : (r === 'no' ? '✘' : '🎲');
+  const resultWord = r === 'or' ? '都要 / 都不要' : labels[r];
+  const text = `🔮 抉择硬币 · 参考意见\n问：${q}\n选项：A = ${labels.yes} / B = ${labels.no}\n硬币说：${r.toUpperCase()} ${mark}（${resultWord}）\n—— 硬币仅供参考，真正的答案在你心里`;
   const done = () => bubble('已复制，去分享吧 📋');
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
@@ -795,6 +877,11 @@ function fallbackCopy(text, done) {
 /* ================= 初始化 ================= */
 document.getElementById('soundBtn').textContent = soundOn ? '🔊' : '🔇';
 initScene();
+// 浏览器要求：声音必须在用户第一次点击/触摸后才能启动
+document.addEventListener('pointerdown', function once() {
+  startAmbience();
+  document.removeEventListener('pointerdown', once);
+});
 </script>
 </body>
 </html>
